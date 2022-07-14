@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Register Page</title>
+      <link rel="stylesheet" href="output.css" />
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+   </head>
+   <body class="bg-slate-100">
+      <div
+         class="h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+      >
+         <div
+            class="max-w-md p-10 bg-white rounded-xl shadow-2xl w-full space-y-8"
+         >
+            <div>
+               <img
+                  class="mx-auto h-12 w-auto animate-bounce"
+                  src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
+                  alt="Workflow"
+               />
+               <h2
+                  class="mt-6 text-center text-3xl font-extrabold text-gray-900"
+               >
+                  Register account
+               </h2>
+            </div>
+            <input type="hidden" name="remember" value="true" />
+            <div class="rounded-md shadow-sm -space-y-px">
+               <div>
+                  <label class="sr-only">Email address</label>
+                  <input
+                     id="email"
+                     name="email"
+                     type="email"
+                     autocomplete="email"
+                     required
+                     class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                     placeholder="Email address"
+                  />
+               </div>
+               <div>
+                  <label class="sr-only">Username</label>
+                  <input
+                     id="username"
+                     name="username"
+                     type="text"
+                     required
+                     class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                     placeholder="Username"
+                  />
+               </div>
+               <div>
+                  <label class="sr-only">Password</label>
+                  <input
+                     id="password"
+                     name="password"
+                     type="password"
+                     autocomplete="current-password"
+                     required
+                     class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                     placeholder="Password"
+                  />
+               </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+               <div class="text-sm">
+                  <a
+                     href="login.html"
+                     class="font-medium text-indigo-600 hover:text-indigo-500"
+                  >
+                     Already have an account
+                  </a>
+               </div>
+            </div>
+
+            <div>
+               <button
+                  id="sub_btn"
+                  class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+               >
+                  <span
+                     class="absolute left-0 inset-y-0 flex items-center pl-3"
+                  >
+                     <svg
+                        class="h-5 w-5 text-indigo-500 group-hover:text-indigo-400"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                     >
+                        <path
+                           fill-rule="evenodd"
+                           d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                           clip-rule="evenodd"
+                        />
+                     </svg>
+                  </span>
+                  Sign Up
+               </button>
+            </div>
+         </div>
+      </div>
+   </body>
+   <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.0/firebase-app.js"
+      //import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-auth.js";
+      import {
+         getDatabase,
+         ref,
+         set,
+         child,
+         get,
+      } from "https://www.gstatic.com/firebasejs/9.9.0/firebase-database.js"
+
+      const firebaseConfig = {
+         apiKey: "AIzaSyDpRg8pkVDaJ0qPJNyREuJCzrAoq7sqeyU",
+         authDomain: "fcloud-db.firebaseapp.com",
+         projectId: "fcloud-db",
+         storageBucket: "fcloud-db.appspot.com",
+         messagingSenderId: "759782377279",
+         appId: "1:759782377279:web:bf5494b2230b95ec97358a",
+      }
+
+      const app = initializeApp(firebaseConfig)
+      const db = getDatabase()
+      const username = document.getElementById("username")
+      const email = document.getElementById("email")
+      const password = document.getElementById("password")
+      const submit = document.getElementById("sub_btn")
+
+      function isEmpty(str) {
+         return str === null || str.match(/^ *$/) !== null
+      }
+
+      function Validation() {
+         let userregex = /^[a-zA-Z0-9]{5,}$/
+         let emailregex = /^[a-zA-Z0-9]+@(gmail|yahoo|outlook)\.com$/
+
+         if (
+            isEmpty(username.value) ||
+            isEmpty(password.value) ||
+            isEmpty(email.value)
+         ) {
+            alert("you cannot left any field empty")
+            return false
+         }
+
+         if (!userregex.test(username.value)) {
+            alert("Username must be aleast 5 character")
+            return false
+         }
+
+         if (!emailregex.test(email.value)) {
+            alert("Enter a Valid email")
+            return false
+         }
+         return true
+      }
+
+      function RegisterUser() {
+         if (!Validation()) {
+            return
+         }
+         const dbRef = ref(db)
+
+         get(child(dbRef, "Userslist/" + username.value)).then((snapshot) => {
+            if (snapshot.exists()) {
+               alert("Acccount Already Exist!!")
+            } else {
+               set(ref(db, "Userslist/" + username.value), {
+                  email: email.value,
+                  username: username.value,
+                  password: encPass(),
+               })
+                  .then(() => {
+                     alert("User added successfully")
+                  })
+                  .catch((error) => {
+                     alert("error" + error)
+                  })
+            }
+         })
+      }
+
+      function encPass(params) {
+         var pass12 = CryptoJS.AES.encrypt(password.value, password.value)
+         return pass12.toString()
+      }
+
+      submit.addEventListener("click", RegisterUser)
+   </script>
+</html>
